@@ -11,10 +11,13 @@ from .serializers import CustomUserRegistrationSerializer, LoginSerializer
 class RegistrationView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = CustomUserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            user.set_password(request.data["password"])  # Hash the password
+            user.save()
             refresh = RefreshToken.for_user(user)
             return Response(
                 {
@@ -34,8 +37,10 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
-        # Générer les tokens JWT et renvoyer la réponse appropriée
-        # ...
-        return Response({"detail": "Login successful."}, status=status.HTTP_200_OK)
+        refresh = RefreshToken.for_user(user)
+        return Response({
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                }, status=status.HTTP_200_OK)
 
 

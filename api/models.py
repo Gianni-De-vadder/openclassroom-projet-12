@@ -43,6 +43,7 @@ class EventStatus(models.Model):
 
 class Event(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE)  # Lien vers le contrat
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
     support_contact = models.ForeignKey(
